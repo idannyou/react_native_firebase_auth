@@ -1,5 +1,5 @@
-import React from "react";
-import { Text, View, TextInput } from "react-native";
+import React from 'react'
+import { Text, View, TextInput } from 'react-native'
 
 const Input = props => {
   return (
@@ -14,28 +14,28 @@ const Input = props => {
         onChangeText={props.onChangeText}
       />
     </View>
-  );
-};
+  )
+}
 
 const styles = {
   viewStyles: {
     margin: 9,
     padding: 9,
     paddingTop: 14,
-    borderColor: "#fff",
+    borderColor: '#fff',
     height: 50,
     flex: 3,
-    flexDirection: "row",
-    alignItems: "center"
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   textStyles: {
     flex: 1,
-    fontSize: 20
+    fontSize: 20,
   },
   textInputStyles: {
     height: 50,
-    flex: 2
-  }
-};
+    flex: 2,
+  },
+}
 
-export default Input;
+export default Input
