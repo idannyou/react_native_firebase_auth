@@ -1,36 +1,50 @@
-import React, { Component } from 'react'
+import React, { useReducer } from 'react'
 import { View, Button } from 'react-native'
 
 import Input from './Input'
 
-export default class LoginForm extends Component {
-  state = { email: '', password: '' }
+const CHANGE_EMAIL = 'CHANGE_EMAIL'
+const CHANGE_PASSWORD = 'CHANGE_PASSWORD'
 
-  onChangeText = state => text =>
-    this.setState({
-      [state]: text,
-    })
+const initialState = { email: '', password: '' }
 
-  render() {
-    return (
-      <View>
-        <Input
-          label="Email"
-          placeholder="user@email.com"
-          value={this.state.email}
-          secureTextEntry={false}
-          onChangeText={this.onChangeText('email')}
-        />
-        <Input
-          label="Password"
-          placeholder="password"
-          value={this.state.password}
-          secureTextEntry={true}
-          onChangeText={this.onChangeText('password')}
-        />
-
-        <Button title="Sign in" onPress={() => console.log('sign in')} />
-      </View>
-    )
+function reducer(state, action) {
+  switch (action.type) {
+    case CHANGE_EMAIL:
+      return { ...state, email: action.text }
+    case CHANGE_PASSWORD:
+      return { ...state, password: action.text }
   }
 }
+
+const handleOnChangeText = (dispatch, type) => text => dispatch({ type, text })
+
+const LoginForm = () => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const { email, password } = state
+  return (
+    <View>
+      <Input
+        label="Email"
+        placeholder="user@email.com"
+        value={email}
+        secureTextEntry={false}
+        onChangeText={handleOnChangeText(dispatch, CHANGE_EMAIL)}
+      />
+      <Input
+        label="Password"
+        placeholder="password"
+        value={password}
+        secureTextEntry={true}
+        onChangeText={handleOnChangeText(dispatch, CHANGE_PASSWORD)}
+      />
+
+      <Button
+        title="Sign in"
+        onPress={() => console.log({ email, password })}
+      />
+    </View>
+  )
+}
+
+export default LoginForm
