@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { View } from "react-native";
-import firebase from "@firebase/app";
+import React, { Component } from 'react'
+import { View } from 'react-native'
+import firebase from '@firebase/app'
 
 import {
   apiKey,
@@ -8,20 +8,28 @@ import {
   databaseURL,
   projectId,
   storageBucket,
-  messagingSenderId
-} from "react-native-dotenv";
+  messagingSenderId,
+} from 'react-native-dotenv'
 
-import Header from "./src/components/Header";
-import LoginForm from "./src/components/LoginForm";
+import Header from './src/components/Header'
+import LoginForm from './src/components/LoginForm'
 
 export default class App extends Component {
   componentDidMount() {}
   render() {
     return (
-      <View>
+      <View style={styles.viewStyles}>
         <Header title="Auth" />
         <LoginForm />
       </View>
-    );
+    )
   }
+}
+
+const styles = {
+  viewStyles: {
+    backgroundColor: '#f8f8f8',
+    flex: 1,
+    justifyContent: 'center',
+  },
 }

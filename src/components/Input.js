@@ -4,7 +4,7 @@ import { Text, View, TextInput } from 'react-native'
 const Input = props => {
   return (
     <View style={styles.viewStyles}>
-      <Text style={styles.textStyles}> {props.label} </Text>
+      <Text style={styles.textStyles}> {props.label}: </Text>
       <TextInput
         value={props.value}
         style={styles.textInputStyles}
@@ -21,18 +21,18 @@ const styles = {
   viewStyles: {
     margin: 9,
     padding: 9,
-    paddingTop: 14,
     borderColor: '#fff',
     height: 50,
-    flex: 3,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   textStyles: {
+    fontSize: 15,
     flex: 1,
-    fontSize: 20,
   },
   textInputStyles: {
+    fontSize: 15,
     height: 50,
     flex: 2,
   },
