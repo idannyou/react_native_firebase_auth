@@ -7,7 +7,6 @@ import LoginForm from './src/components/LoginForm'
 
 export default class App extends Component {
   render() {
-    console.log(Firebase)
     return (
       <View style={styles.viewStyles}>
         <Header title="Auth" />

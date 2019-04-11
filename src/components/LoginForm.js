@@ -1,10 +1,15 @@
 import React, { useReducer } from 'react'
 import { View, Button } from 'react-native'
 
+import Firebase from '../Firebase'
+
 import Input from './Input'
 
 const CHANGE_EMAIL = 'CHANGE_EMAIL'
 const CHANGE_PASSWORD = 'CHANGE_PASSWORD'
+
+const SIGN_IN = 'SIGN_IN'
+const SIGN_UP = 'SIGN_UP'
 
 const initialState = { email: '', password: '' }
 
@@ -14,10 +19,22 @@ function reducer(state, action) {
       return { ...state, email: action.text }
     case CHANGE_PASSWORD:
       return { ...state, password: action.text }
+    case SIGN_IN:
+      const { email, password } = state
+
+      try {
+        Firebase.auth().signInWithEmailAndPassword(email, password)
+      } catch (e) {
+        console.log(e)
+      }
+
+      return { ...state }
+    case SIGN_UP:
+      return { ...state }
   }
 }
 
-const handleOnChangeText = (dispatch, type) => text => dispatch({ type, text })
+const dispatchAction = (dispatch, type) => text => dispatch({ type, text })
 
 const LoginForm = () => {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -29,20 +46,17 @@ const LoginForm = () => {
         placeholder="user@email.com"
         value={email}
         secureTextEntry={false}
-        onChangeText={handleOnChangeText(dispatch, CHANGE_EMAIL)}
+        onChangeText={dispatchAction(dispatch, CHANGE_EMAIL)}
       />
       <Input
         label="Password"
         placeholder="password"
         value={password}
         secureTextEntry={true}
-        onChangeText={handleOnChangeText(dispatch, CHANGE_PASSWORD)}
+        onChangeText={dispatchAction(dispatch, CHANGE_PASSWORD)}
       />
 
-      <Button
-        title="Sign in"
-        onPress={() => console.log({ email, password })}
-      />
+      <Button title="Sign in" onPress={dispatchAction(dispatch, SIGN_IN)} />
     </View>
   )
 }
