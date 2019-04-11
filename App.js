@@ -1,22 +1,13 @@
 import React, { Component } from 'react'
 import { View } from 'react-native'
-import firebase from '@firebase/app'
 
-import {
-  apiKey,
-  authDomain,
-  databaseURL,
-  projectId,
-  storageBucket,
-  messagingSenderId,
-} from 'react-native-dotenv'
-
+import Firebase from './src/Firebase'
 import Header from './src/components/Header'
 import LoginForm from './src/components/LoginForm'
 
 export default class App extends Component {
-  componentDidMount() {}
   render() {
+    console.log(Firebase)
     return (
       <View style={styles.viewStyles}>
         <Header title="Auth" />
