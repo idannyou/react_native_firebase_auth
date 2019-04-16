@@ -1,5 +1,5 @@
-import React, { useReducer } from 'react'
-import { View, Button, Text } from 'react-native'
+import React, { Fragment, useReducer } from 'react'
+import { ActivityIndicator, Button, View, Text } from 'react-native'
 
 import Firebase from '../Firebase'
 
@@ -9,11 +9,12 @@ const CHANGE_EMAIL = 'CHANGE_EMAIL'
 const CHANGE_PASSWORD = 'CHANGE_PASSWORD'
 
 const SIGN_IN = 'SIGN_IN'
+const SIGN_IN_SUCCESS = 'SIGN_IN_SUCCESS'
 const SIGN_IN_ERROR = 'SIGN_IN_ERROR'
 
 const SIGN_UP = 'SIGN_UP'
 
-const initialState = { email: '', password: '', error: '' }
+const initialState = { email: '', isLoading: false, password: '', error: '' }
 
 function reducer(state, action) {
   switch (action.type) {
@@ -22,10 +23,13 @@ function reducer(state, action) {
     case CHANGE_PASSWORD:
       return { ...state, password: action.text }
     case SIGN_IN:
-      return { ...state }
+      return { ...state, isLoading: true }
     case SIGN_IN_ERROR:
       console.log('error', { action })
-      return { ...state, error: action.error }
+      return { ...state, error: action.error, isLoading: false }
+    case SIGN_IN_SUCCESS:
+      console.log('success', { action })
+      return { ...state, isLoading: false }
     case SIGN_UP:
       return { ...state }
   }
@@ -39,7 +43,6 @@ const ERROR_CODE = {
 }
 
 handleSignInError = ({ dispatch, error }) => {
-  console.log(error)
   switch (error.code) {
     case ERROR_CODE[NOT_FOUND]:
       dispatch({
@@ -57,10 +60,10 @@ handleSignInError = ({ dispatch, error }) => {
 }
 
 const handleSignIn = ({ dispatch, email, password }) => async () => {
+  dispatch({ type: SIGN_IN })
   try {
     const payload = Firebase.auth().signInWithEmailAndPassword(email, password)
-    const resolvedPayload = await payload
-    console.log({ dispatch, email, password, resolvedPayload })
+    handleSignIn({ dispatch, payload: await payload })
   } catch (error) {
     handleSignInError({ dispatch, error })
   }
@@ -68,32 +71,47 @@ const handleSignIn = ({ dispatch, email, password }) => async () => {
 
 const LoginForm = () => {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { email, error, password } = state
+  const { email, error, isLoading, password } = state
+
   return (
-    <View>
-      <Input
-        label="Email"
-        placeholder="user@email.com"
-        value={email}
-        secureTextEntry={false}
-        onChangeText={handleOnChangeText(dispatch, CHANGE_EMAIL)}
-      />
-      <Input
-        label="Password"
-        placeholder="password"
-        value={password}
-        secureTextEntry={true}
-        onChangeText={handleOnChangeText(dispatch, CHANGE_PASSWORD)}
-      />
+    <View style={styles.viewStyles}>
+      {isLoading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <Fragment>
+          <Input
+            label="Email"
+            placeholder="user@email.com"
+            value={email}
+            secureTextEntry={false}
+            onChangeText={handleOnChangeText(dispatch, CHANGE_EMAIL)}
+          />
+          <Input
+            label="Password"
+            placeholder="password"
+            value={password}
+            secureTextEntry={true}
+            onChangeText={handleOnChangeText(dispatch, CHANGE_PASSWORD)}
+          />
 
-      <Button
-        title="Sign in"
-        onPress={handleSignIn({ dispatch, email, password })}
-      />
+          <Button
+            title="Sign in"
+            onPress={handleSignIn({ dispatch, email, password })}
+          />
 
-      <Text>{error}</Text>
+          <Text>{error}</Text>
+        </Fragment>
+      )}
     </View>
   )
+}
+
+const styles = {
+  viewStyles: {
+    backgroundColor: '#f8f8f8',
+    height: 250,
+    justifyContent: 'center',
+  },
 }
 
 export default LoginForm

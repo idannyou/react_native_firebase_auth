@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { View } from 'react-native'
 
-import Firebase from './src/Firebase'
 import Header from './src/components/Header'
 import LoginForm from './src/components/LoginForm'
 
