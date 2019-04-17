@@ -11,6 +11,8 @@ import {
   SIGN_IN_SUCCESS,
   SIGN_IN_ERROR,
   SIGN_UP,
+  SIGN_UP_SUCCESS,
+  SIGN_UP_ERROR,
   NOT_FOUND,
   ERROR_CODE,
 } from '../constants'
@@ -29,12 +31,22 @@ function reducer(state, action) {
       return { ...state, isLoading: true }
     case SIGN_IN_ERROR:
       console.log('error', { action })
+
       return { ...state, error: action.error, isLoading: false }
     case SIGN_IN_SUCCESS:
-      console.log('success', { action })
+      console.log('sign in success', {
+        action,
+        user: Firebase.auth().currentUser,
+      })
       return { ...state, isLoading: false }
     case SIGN_UP:
-      return { ...state }
+      return { ...state, isLoading: true }
+    case SIGN_UP_SUCCESS:
+      console.log('sign up success', { action })
+      return { ...state, isLoading: false }
+    case SIGN_UP_ERROR:
+      console.log('sign up error', { action })
+      return { ...state, isLoading: false }
   }
 }
 
@@ -61,13 +73,44 @@ const handleSignIn = ({ dispatch, email, password }) => async () => {
   dispatch({ type: SIGN_IN })
   try {
     const payload = Firebase.auth().signInWithEmailAndPassword(email, password)
-    handleSignIn({ dispatch, payload: await payload })
+    dispatch({ type: SIGN_IN_SUCCESS, payload: await payload })
   } catch (error) {
     handleSignInError({ dispatch, error })
   }
 }
 
-const LoginForm = ({ title, toggleSign }) => {
+handleSignUpError = ({ dispatch, error }) => {
+  console.log({ error })
+  switch (error.code) {
+    case ERROR_CODE[NOT_FOUND]:
+      dispatch({
+        type: SIGN_UP_ERROR,
+        error: 'User is not found. Please Sign Up.',
+      })
+      break
+    default:
+      dispatch({
+        type: SIGN_UP_ERROR,
+        error: 'General Error',
+      })
+      break
+  }
+}
+
+const handleSignUp = ({ dispatch, email, password }) => async () => {
+  dispatch({ type: SIGN_UP })
+  try {
+    const payload = Firebase.auth().createUserWithEmailAndPassword(
+      email,
+      password
+    )
+    dispatch({ type: SIGN_UP_SUCCESS, payload: await payload })
+  } catch (error) {
+    handleSignUpError({ dispatch, error })
+  }
+}
+
+const LoginForm = ({ signInState, title, toggleSign }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { email, error, isLoading, password } = state
 
@@ -78,6 +121,12 @@ const LoginForm = ({ title, toggleSign }) => {
       })
     }, 4000)
   }, [error])
+
+  const signProps = { dispatch, email, password }
+
+  const handleButtonPress = signInState
+    ? handleSignIn(signProps)
+    : handleSignUp(signProps)
 
   return (
     <View style={styles.viewStyles}>
@@ -100,10 +149,7 @@ const LoginForm = ({ title, toggleSign }) => {
             onChangeText={handleOnChangeText(dispatch, CHANGE_PASSWORD)}
           />
 
-          <Button
-            title={title}
-            onPress={handleSignIn({ dispatch, email, password })}
-          />
+          <Button title={title} onPress={handleButtonPress} />
 
           <Text style={styles.toggle} onPress={toggleSign}>
             Sign In / Sign Up

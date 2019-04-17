@@ -17,7 +17,11 @@ const App = () => {
   return (
     <View style={styles.viewStyles}>
       <Header title={title} />
-      <LoginForm title={title} toggleSign={handleToggleSign} />
+      <LoginForm
+        title={title}
+        signInState={signInState}
+        toggleSign={handleToggleSign}
+      />
     </View>
   )
 }
