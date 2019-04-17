@@ -1,18 +1,19 @@
-import React, { Fragment, useReducer } from 'react'
+import React, { Fragment, useEffect, useReducer } from 'react'
 import { ActivityIndicator, Button, View, Text } from 'react-native'
 
 import Firebase from '../Firebase'
-
 import Input from './Input'
-
-const CHANGE_EMAIL = 'CHANGE_EMAIL'
-const CHANGE_PASSWORD = 'CHANGE_PASSWORD'
-
-const SIGN_IN = 'SIGN_IN'
-const SIGN_IN_SUCCESS = 'SIGN_IN_SUCCESS'
-const SIGN_IN_ERROR = 'SIGN_IN_ERROR'
-
-const SIGN_UP = 'SIGN_UP'
+import {
+  CHANGE_EMAIL,
+  CHANGE_PASSWORD,
+  CLEAR_ERROR,
+  SIGN_IN,
+  SIGN_IN_SUCCESS,
+  SIGN_IN_ERROR,
+  SIGN_UP,
+  NOT_FOUND,
+  ERROR_CODE,
+} from '../constants'
 
 const initialState = { email: '', isLoading: false, password: '', error: '' }
 
@@ -22,6 +23,8 @@ function reducer(state, action) {
       return { ...state, email: action.text }
     case CHANGE_PASSWORD:
       return { ...state, password: action.text }
+    case CLEAR_ERROR:
+      return { ...state, error: '' }
     case SIGN_IN:
       return { ...state, isLoading: true }
     case SIGN_IN_ERROR:
@@ -36,11 +39,6 @@ function reducer(state, action) {
 }
 
 const handleOnChangeText = (dispatch, type) => text => dispatch({ type, text })
-
-const NOT_FOUND = 'NOT_FOUND'
-const ERROR_CODE = {
-  [NOT_FOUND]: 'auth/user-not-found',
-}
 
 handleSignInError = ({ dispatch, error }) => {
   switch (error.code) {
@@ -69,9 +67,17 @@ const handleSignIn = ({ dispatch, email, password }) => async () => {
   }
 }
 
-const LoginForm = () => {
+const LoginForm = ({ title, toggleSign }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { email, error, isLoading, password } = state
+
+  useEffect(() => {
+    setTimeout(() => {
+      dispatch({
+        type: CLEAR_ERROR,
+      })
+    }, 4000)
+  }, [error])
 
   return (
     <View style={styles.viewStyles}>
@@ -95,11 +101,15 @@ const LoginForm = () => {
           />
 
           <Button
-            title="Sign in"
+            title={title}
             onPress={handleSignIn({ dispatch, email, password })}
           />
 
-          <Text>{error}</Text>
+          <Text style={styles.toggle} onPress={toggleSign}>
+            Sign In / Sign Up
+          </Text>
+
+          <Text style={styles.error}>{error}</Text>
         </Fragment>
       )}
     </View>
@@ -107,10 +117,18 @@ const LoginForm = () => {
 }
 
 const styles = {
+  error: {
+    color: 'red',
+    margin: 10,
+  },
   viewStyles: {
-    backgroundColor: '#f8f8f8',
+    alignItems: 'center',
+    backgroundColor: 'white',
     height: 250,
     justifyContent: 'center',
+  },
+  toggle: {
+    textDecorationLine: 'underline',
   },
 }
 
